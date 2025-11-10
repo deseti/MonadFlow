@@ -1,0 +1,202 @@
+# MonadFlow
+
+<div align="center">
+  <h1>🌊 MonadFlow</h1>
+  <p><strong>A 3D Interactive Discovery Layer for Monad Ecosystem</strong></p>
+  <p>
+    <a href="https://monadflow.vercel.app">Live Demo</a> •
+    <a href="#features">Features</a> •
+    <a href="#tech-stack">Tech Stack</a> •
+    <a href="#getting-started">Getting Started</a> •
+    <a href="#contributing">Contributing</a>
+  </p>
+</div>
+
+---
+
+## 🎯 Overview
+
+MonadFlow is an immersive 3D discovery platform and AI-powered recommendation engine built for the Monad mainnet ecosystem. Explore 200+ dApps through an interactive network graph, get personalized recommendations, and gamify your journey through the Monad ecosystem.
+
+**Built for:** Mission 9: Squad Up Challenge
+
+## ✨ Features
+
+### 🎨 3D Network Visualization
+- Interactive node-based interface powered by Three.js
+- Visual representation of dApp relationships and composability
+- Smooth animations and transitions
+- Real-time data integration
+
+### 🤖 AI-Powered Recommendations
+- Smart recommendations based on wallet activity
+- Personalized discovery experience
+- "Users like you also use..." suggestions
+- Machine learning-powered insights
+
+### 🎮 Gamification
+- Explorer badges and achievements
+- Activity tracking and progress
+- Leaderboard system
+- Unlock rewards by discovering dApps
+
+### 🔍 Advanced Discovery
+- Filter by 15+ categories (DeFi, Gaming, NFT, AI, etc.)
+- Search functionality
+- "Only on Monad" filter
+- Live mainnet data integration
+
+### 📊 Live Data
+- Real-time TVL, volume, and user statistics
+- Direct integration with Monad mainnet protocols
+- Up-to-date ecosystem information
+
+## 🛠 Tech Stack
+
+### Frontend
+- **Next.js 14** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **TailwindCSS** - Utility-first CSS
+- **React Three Fiber** - 3D graphics with Three.js
+- **Framer Motion** - Animation library
+
+### Web3
+- **Viem** - Modern TypeScript Ethereum library
+- **Wagmi** - React hooks for Ethereum
+- **RainbowKit** - Wallet connection UI
+
+### State Management
+- **Zustand** - Lightweight state management
+- **TanStack Query** - Data fetching and caching
+
+### AI/ML
+- **OpenAI API** - Smart recommendations
+- **Vercel AI SDK** - AI integration
+
+### Deployment
+- **Vercel** - Frontend hosting and serverless functions
+- **GitHub** - Version control and collaboration
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18.17.0 or higher
+- npm 9.0.0 or higher
+- Git
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/deseti/MonadFlow.git
+   cd MonadFlow
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Setup environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. **Configure your `.env.local`**
+   ```env
+   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_project_id
+   NEXT_PUBLIC_MONAD_RPC_URL=https://rpc.monad.xyz
+   OPENAI_API_KEY=your_openai_key
+   ```
+
+   Get your WalletConnect Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com)
+
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 📁 Project Structure
+
+```
+MonadFlow/
+├── app/                    # Next.js App Router
+│   ├── (marketing)/        # Landing pages
+│   ├── explorer/           # Main app
+│   ├── dapp/[id]/         # DApp detail pages
+│   └── api/               # API routes
+├── components/
+│   ├── ui/                # UI components (shadcn)
+│   ├── 3d/                # Three.js components
+│   └── features/          # Feature-specific components
+├── lib/
+│   ├── web3/              # Web3 utilities
+│   ├── ai/                # AI/ML utilities
+│   └── db/                # Database utilities
+├── types/                 # TypeScript type definitions
+├── public/                # Static assets
+└── docs/                  # Documentation
+```
+
+## 🎨 Design System
+
+MonadFlow uses the Monad brand colors:
+- **Purple**: `#8B5CF6`
+- **Blue**: `#3B82F6`
+- **Cyan**: `#06B6D4`
+
+## 📖 Documentation
+
+- [Contributing Guide](./CONTRIBUTING.md)
+- [API Documentation](./docs/API.md)
+- [Component Library](./docs/COMPONENTS.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 👥 Team
+
+Built by a team of 2 passionate developers for the Mission 9: Squad Up Challenge.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Monad](https://www.monad.xyz/) - For the incredible ecosystem
+- [Mission 9 Challenge](https://tally.so/r/31qYe4) - For the opportunity
+- All the amazing Monad dApp builders
+
+## 🔗 Links
+
+- **Live Demo**: [monadflow.vercel.app](https://monadflow.vercel.app)
+- **GitHub**: [github.com/deseti/MonadFlow](https://github.com/deseti/MonadFlow)
+- **Twitter**: [@MonadFlow](#) (Coming soon)
+
+## 📊 Stats
+
+- 🎨 200+ dApps indexed
+- 🏷️ 15+ categories
+- 🔴 Live mainnet data
+- 🎮 Gamified exploration
+- 🤖 AI-powered recommendations
+
+---
+
+<div align="center">
+  <p>Built with ❤️ for the Monad ecosystem</p>
+  <p>Mission 9: Squad Up Challenge | November 2025</p>
+</div>
