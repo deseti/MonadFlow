@@ -2,7 +2,10 @@
 
 ## Official Network Details
 
-### Monad Testnet
+### ⚠️ Important Note
+**Monad Mainnet has NOT launched yet. Only Testnet is available.**
+
+### Monad Testnet ✅
 - **Chain ID**: `10143`
 - **Network Name**: Monad Testnet
 - **RPC URL**: `https://testnet-rpc.monad.xyz`
@@ -10,12 +13,12 @@
 - **Currency Name**: Monad
 - **Decimals**: 18
 - **Block Explorer**: https://testnet.monvision.io/
+- **Status**: ✅ Live and Active
 
-### Monad Mainnet
-- **Status**: Coming Soon
-- **Chain ID**: TBD (To Be Determined)
-- **Network Name**: Monad
-- **Currency Symbol**: `MON`
+### Monad Mainnet ⏳
+- **Status**: 🚧 Not Launched Yet
+- **Launch Date**: TBA (To Be Announced)
+- **Note**: MonadFlow currently uses Testnet only
 
 ## Adding Monad Testnet to MetaMask
 
@@ -46,6 +49,7 @@ To get testnet MON tokens for development:
 The network is configured in `lib/web3/config.ts`:
 
 ```typescript
+// Only Testnet is configured (Mainnet not launched yet)
 export const monadTestnet: Chain = {
   id: 10143,
   name: "Monad Testnet",
@@ -71,14 +75,11 @@ export const monadTestnet: Chain = {
 
 ## Environment Variables
 
-Set these in your `.env.local` file:
+Set this in your `.env.local` file:
 
 ```bash
-# Monad Testnet RPC
+# Only Testnet (Mainnet not available yet)
 NEXT_PUBLIC_MONAD_TESTNET_RPC_URL=https://testnet-rpc.monad.xyz
-
-# Monad Mainnet RPC (when available)
-NEXT_PUBLIC_MONAD_RPC_URL=https://rpc.monad.xyz
 ```
 
 ## Resources
