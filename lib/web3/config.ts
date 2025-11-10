@@ -30,7 +30,7 @@ export const monadMainnet: Chain = {
 
 // Monad Testnet Configuration
 export const monadTestnet: Chain = {
-  id: 10143, // Monad Testnet Chain ID (verify this)
+  id: 10143, // Monad Testnet Chain ID (Official)
   name: "Monad Testnet",
   nativeCurrency: {
     name: "Monad",
@@ -47,8 +47,8 @@ export const monadTestnet: Chain = {
   },
   blockExplorers: {
     default: {
-      name: "Monad Testnet Explorer",
-      url: "https://testnet-explorer.monad.xyz",
+      name: "Monad Vision Explorer",
+      url: "https://testnet.monvision.io",
     },
   },
   testnet: true,
