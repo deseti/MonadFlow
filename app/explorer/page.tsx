@@ -4,6 +4,7 @@ import { useState } from "react";
 import { dappsData, getCategories } from "@/lib/data/dapps";
 import { DApp } from "@/types";
 import { Search, Filter, Grid3x3, Network } from "lucide-react";
+import { ConnectWallet } from "@/components/connect-wallet";
 
 export default function ExplorerPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,9 +36,7 @@ export default function ExplorerPage() {
               MonadFlow
             </a>
             <div className="flex items-center gap-4">
-              <button className="px-4 py-2 glass rounded-lg text-sm text-white hover:scale-105 transition-transform">
-                Connect Wallet
-              </button>
+              <ConnectWallet />
             </div>
           </div>
         </div>

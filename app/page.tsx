@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Network, Brain } from "lucide-react";
+import { ConnectWallet } from "@/components/connect-wallet";
 
 export default function Home() {
   return (
@@ -38,17 +39,14 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 mt-8">
             <Link
               href="/explorer"
-              className="group px-8 py-4 bg-gradient-to-r from-monad-purple to-monad-blue rounded-lg font-semibold text-white hover:scale-105 transition-transform duration-200 flex items-center gap-2"
+              className="group px-8 py-4 bg-gradient-to-r from-monad-purple to-monad-blue rounded-lg font-semibold text-white hover:scale-105 transition-transform duration-200 flex items-center justify-center gap-2"
             >
               Start Exploring
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link
-              href="/about"
-              className="px-8 py-4 glass rounded-lg font-semibold text-white hover:scale-105 transition-transform duration-200"
-            >
-              Learn More
-            </Link>
+            <div className="flex justify-center">
+              <ConnectWallet />
+            </div>
           </div>
 
           {/* Stats */}
