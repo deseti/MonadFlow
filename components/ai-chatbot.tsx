@@ -84,7 +84,7 @@ export function AIChatbot() {
     } catch (error: any) {
       const errorMessage: Message = {
         role: "assistant",
-        content: `❌ Maaf, terjadi kesalahan: ${error.message}\n\n💡 Tips:\n• Pastikan GEMINI_API_KEY sudah di-set di Vercel environment\n• Coba refresh halaman\n• Cek koneksi internet Anda\n\n🔧 Error details: ${error.message}`,
+        content: `❌ Error: ${error.message}\n\n💡 Tips:\n• Make sure GEMINI_API_KEY is set in Vercel environment variables\n• Try refreshing the page\n• Check your internet connection\n• Check browser console (F12) for details`,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);

@@ -166,8 +166,8 @@ export async function POST(req: NextRequest) {
 
     console.log("✅ GEMINI_API_KEY found, initializing Gemini API...");
 
-    // Initialize the model (using gemini-1.5-flash for best compatibility)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Initialize the model (using gemini-1.5-pro which is available in v1 API)
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     // Build conversation history with NadAI system prompt
     const chat = model.startChat({
@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
         },
         {
           role: "model",
-          parts: [{ text: "Saya siap! 🚀 Saya adalah NadAI, asisten AI khusus MonadFlow yang siap membantu Anda menjelajahi ekosistem Monad. Tanyakan apa saja tentang dApps, blockchain, atau cara menggunakan platform ini. Apa yang ingin Anda ketahui? ✨" }],
+          parts: [{ text: "Ready! 🚀 I'm NadAI, the official AI assistant for MonadFlow. I'm here to help you explore the Monad ecosystem. Ask me anything about dApps, blockchain, or how to use this platform. What would you like to know? ✨" }],
         },
         ...history.map((msg: any) => ({
           role: msg.role === "user" ? "user" : "model",
