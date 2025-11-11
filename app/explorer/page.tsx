@@ -7,6 +7,10 @@ import { Search, Grid3x3, Network, Info } from "lucide-react";
 import { ConnectWallet } from "@/components/connect-wallet";
 import dynamic from "next/dynamic";
 import { DAppDetailModal } from "@/components/dapp-detail-modal";
+import { StatsPanel } from "@/components/stats-panel";
+import { NetworkPulse } from "@/components/network-pulse";
+import { TourGuide } from "@/components/tour-guide";
+import { RecommendationPanel } from "@/components/recommendation-panel";
 
 // Dynamically import 3D components (client-side only)
 const NetworkGraph = dynamic(
@@ -24,13 +28,7 @@ const NetworkGraph = dynamic(
 export default function ExplorerPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  // Auto-detect mobile: 3D on desktop, grid on mobile
-  const [viewMode, setViewMode] = useState<"3d" | "grid">(() => {
-    if (typeof window !== "undefined") {
-      return window.innerWidth >= 1024 ? "3d" : "grid";
-    }
-    return "3d";
-  });
+  const [viewMode, setViewMode] = useState<"3d" | "grid">("3d"); // Always 3D by default!
   const [selectedDApp, setSelectedDApp] = useState<DApp | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -58,12 +56,13 @@ export default function ExplorerPage() {
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
       {/* Header */}
       <header className="border-b border-white/10 backdrop-blur-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-3 sm:px-4 py-4">
           <div className="flex items-center justify-between">
             <a href="/" className="text-2xl font-bold gradient-text">
               MonadFlow
             </a>
             <div className="flex items-center gap-4">
+              <NetworkPulse />
               <ConnectWallet />
             </div>
           </div>
@@ -71,6 +70,9 @@ export default function ExplorerPage() {
       </header>
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        {/* Live Stats Panel */}
+        <StatsPanel />
+
         {/* Search and Filters */}
         <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
           {/* Search Bar */}
@@ -187,6 +189,23 @@ export default function ExplorerPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+
+      {/* Recommendation Panel - Only show in grid view on the side */}
+      {viewMode === "grid" && selectedDApp && (
+        <div className="fixed bottom-8 right-8 w-96 max-w-[calc(100vw-2rem)] max-h-96 overflow-y-auto z-40">
+          <RecommendationPanel
+            selectedDApp={selectedDApp}
+            relatedDApps={dappsData.filter(
+              (d) =>
+                d.id !== selectedDApp.id &&
+                d.categories.some((cat) => selectedDApp.categories.includes(cat))
+            )}
+          />
+        </div>
+      )}
+
+      {/* Interactive Tour Guide */}
+      <TourGuide isFirstTime={true} />
     </main>
   );
 }

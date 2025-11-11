@@ -115,15 +115,30 @@ export function DAppNode({
 
       {/* Category badge */}
       {isHovered && (
-        <Text
-          position={[0, -0.8, 0]}
-          fontSize={0.15}
-          color={color}
-          anchorX="center"
-          anchorY="middle"
-        >
-          {dapp.categories[0]}
-        </Text>
+        <>
+          <Text
+            position={[0, -0.8, 0]}
+            fontSize={0.15}
+            color={color}
+            anchorX="center"
+            anchorY="middle"
+          >
+            {dapp.categories[0]}
+          </Text>
+          
+          {/* Quick stats on hover */}
+          {dapp.tvl && (
+            <Text
+              position={[0, -1.1, 0]}
+              fontSize={0.12}
+              color="#9CA3AF"
+              anchorX="center"
+              anchorY="middle"
+            >
+              {`TVL: $${(dapp.tvl / 1000000).toFixed(1)}M`}
+            </Text>
+          )}
+        </>
       )}
     </group>
   );
