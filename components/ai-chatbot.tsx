@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Sparkles, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Message {
   role: "user" | "assistant";
@@ -67,19 +69,65 @@ export function AIChatbot() {
         }),
       });
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
 
-      if (data.success && data.response) {
-        const assistantMessage: Message = {
-          role: "assistant",
-          content: data.response,
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
-      } else {
-        const errorMsg = data.error || "Failed to get response from NadAI";
-        console.error("API Error:", { status: response.status, error: errorMsg, debug: data.debug });
-        throw new Error(errorMsg);
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error("No response stream available");
+      }
+
+      // Create placeholder message for streaming
+      const placeholderMessage: Message = {
+        role: "assistant",
+        content: "",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, placeholderMessage]);
+
+      let accumulatedText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6);
+            
+            if (data === "[DONE]") {
+              break;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.content) {
+                accumulatedText += parsed.content;
+                
+                // Update the last message with accumulated text
+                setMessages((prev) => {
+                  const newMessages = [...prev];
+                  newMessages[newMessages.length - 1] = {
+                    role: "assistant",
+                    content: accumulatedText,
+                    timestamp: new Date(),
+                  };
+                  return newMessages;
+                });
+              }
+            } catch (e) {
+              // Skip invalid JSON
+            }
+          }
+        }
       }
     } catch (error: any) {
       const errorMessage: Message = {
@@ -103,7 +151,7 @@ export function AIChatbot() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Desktop Only */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -111,7 +159,7 @@ export function AIChatbot() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-monad-purple to-monad-blue rounded-full shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center group"
+            className="hidden md:flex fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-monad-purple to-monad-blue rounded-full shadow-lg hover:shadow-xl transition-shadow items-center justify-center group"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             title="Chat with NadAI"
@@ -122,14 +170,33 @@ export function AIChatbot() {
         )}
       </AnimatePresence>
 
-      {/* Chat Window */}
+      {/* Mobile Floating Button */}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            onClick={() => setIsOpen(true)}
+            className="md:hidden fixed bottom-6 right-6 z-50 w-12 h-12 bg-gradient-to-r from-monad-purple to-monad-blue rounded-full shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center group"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            title="Chat with NadAI"
+          >
+            <Sparkles className="w-5 h-5 text-white group-hover:rotate-12 transition-transform" />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Chat Window - Desktop (Fixed Bottom-Right) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-3rem)] glass rounded-2xl shadow-2xl flex flex-col border border-white/20"
+            className="hidden md:flex fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-3rem)] glass rounded-2xl shadow-2xl flex-col border border-white/20"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -168,9 +235,61 @@ export function AIChatbot() {
                         : "bg-white/10 text-gray-200"
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap break-words">
-                      {message.content}
-                    </p>
+                    {message.role === "user" ? (
+                      <p className="text-sm whitespace-pre-wrap break-words">
+                        {message.content}
+                      </p>
+                    ) : (
+                      <div className="text-sm prose prose-invert prose-sm max-w-none">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ children }) => (
+                              <p className="mb-2 last:mb-0">{children}</p>
+                            ),
+                            ul: ({ children }) => (
+                              <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>
+                            ),
+                            ol: ({ children }) => (
+                              <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>
+                            ),
+                            li: ({ children }) => (
+                              <li className="text-gray-200">{children}</li>
+                            ),
+                            strong: ({ children }) => (
+                              <strong className="font-bold text-white">{children}</strong>
+                            ),
+                            em: ({ children }) => (
+                              <em className="italic text-gray-300">{children}</em>
+                            ),
+                            code: ({ className, children }) => {
+                              const isInline = !className;
+                              return isInline ? (
+                                <code className="bg-black/30 px-1.5 py-0.5 rounded text-monad-purple font-mono text-xs">
+                                  {children}
+                                </code>
+                              ) : (
+                                <code className="block bg-black/40 p-2 rounded-lg overflow-x-auto font-mono text-xs text-gray-300 my-2">
+                                  {children}
+                                </code>
+                              );
+                            },
+                            a: ({ href, children }) => (
+                              <a
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-monad-purple hover:text-monad-blue underline"
+                              >
+                                {children}
+                              </a>
+                            ),
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
+                    )}
                     <p
                       className={`text-xs mt-1 ${
                         message.role === "user"
@@ -225,6 +344,163 @@ export function AIChatbot() {
               <p className="text-xs text-gray-500 mt-2 text-center">
                 NadAI - Your MonadFlow Guide • Press Enter to send
               </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Chat Window - Mobile (Full Screen) */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="md:hidden fixed inset-0 z-50 w-screen h-screen glass flex flex-col"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/30 backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-monad-purple to-monad-blue rounded-full flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold">NadAI</h3>
+                  <p className="text-xs text-gray-400">MonadFlow Guide</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-4 py-2 ${
+                      message.role === "user"
+                        ? "bg-gradient-to-r from-monad-purple to-monad-blue text-white"
+                        : "bg-white/10 text-gray-200"
+                    }`}
+                  >
+                    {message.role === "user" ? (
+                      <p className="text-sm whitespace-pre-wrap break-words">
+                        {message.content}
+                      </p>
+                    ) : (
+                      <div className="text-sm prose prose-invert prose-sm max-w-none">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ children }) => (
+                              <p className="mb-2 last:mb-0">{children}</p>
+                            ),
+                            ul: ({ children }) => (
+                              <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>
+                            ),
+                            ol: ({ children }) => (
+                              <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>
+                            ),
+                            li: ({ children }) => (
+                              <li className="text-gray-200">{children}</li>
+                            ),
+                            strong: ({ children }) => (
+                              <strong className="font-bold text-white">{children}</strong>
+                            ),
+                            em: ({ children }) => (
+                              <em className="italic text-gray-300">{children}</em>
+                            ),
+                            code: ({ className, children }) => {
+                              const isInline = !className;
+                              return isInline ? (
+                                <code className="bg-black/30 px-1.5 py-0.5 rounded text-monad-purple font-mono text-xs">
+                                  {children}
+                                </code>
+                              ) : (
+                                <code className="block bg-black/40 p-2 rounded-lg overflow-x-auto font-mono text-xs text-gray-300 my-2">
+                                  {children}
+                                </code>
+                              );
+                            },
+                            a: ({ href, children }) => (
+                              <a
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-monad-purple hover:text-monad-blue underline"
+                              >
+                                {children}
+                              </a>
+                            ),
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
+                    )}
+                    <p
+                      className={`text-xs mt-1 ${
+                        message.role === "user"
+                          ? "text-white/70"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      {message.timestamp.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex justify-start"
+                >
+                  <div className="bg-white/10 rounded-2xl px-4 py-3 flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 text-monad-purple animate-spin" />
+                    <span className="text-sm text-gray-300">Thinking...</span>
+                  </div>
+                </motion.div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="p-4 border-t border-white/10 bg-black/30 backdrop-blur-md">
+              <div className="flex gap-2">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask me anything..."
+                  disabled={isLoading}
+                  className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-monad-purple transition-colors disabled:opacity-50"
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || isLoading}
+                  className="w-10 h-10 bg-gradient-to-r from-monad-purple to-monad-blue rounded-xl flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
+                >
+                  <Send className="w-5 h-5 text-white" />
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
