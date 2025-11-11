@@ -21,6 +21,9 @@ export function NetworkGraph({ dapps, onDAppClick }: NetworkGraphProps) {
   const [hoveredDApp, setHoveredDApp] = useState<DApp | null>(null);
   const [selectedDApp, setSelectedDApp] = useState<DApp | null>(null);
 
+  // Detect if mobile
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
+
   // Generate positions for nodes in 3D space
   const nodePositions = useMemo(() => {
     const positions = new Map<string, [number, number, number]>();
@@ -136,12 +139,13 @@ export function NetworkGraph({ dapps, onDAppClick }: NetworkGraphProps) {
         <OrbitControls
           enableDamping
           dampingFactor={0.05}
-          rotateSpeed={0.5}
-          zoomSpeed={0.8}
-          minDistance={10}
-          maxDistance={40}
+          rotateSpeed={isMobile ? 0.3 : 0.5}
+          zoomSpeed={isMobile ? 0.4 : 0.8}
+          minDistance={isMobile ? 15 : 10}
+          maxDistance={isMobile ? 35 : 40}
           autoRotate
-          autoRotateSpeed={0.5}
+          autoRotateSpeed={isMobile ? 0.2 : 0.5}
+          enablePan={!isMobile}
         />
       </Canvas>
     </div>

@@ -24,7 +24,13 @@ const NetworkGraph = dynamic(
 export default function ExplorerPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"3d" | "grid">("3d"); // 3D as default!
+  // Auto-detect mobile: 3D on desktop, grid on mobile
+  const [viewMode, setViewMode] = useState<"3d" | "grid">(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth >= 1024 ? "3d" : "grid";
+    }
+    return "3d";
+  });
   const [selectedDApp, setSelectedDApp] = useState<DApp | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -64,9 +70,9 @@ export default function ExplorerPage() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Search and Filters */}
-        <div className="mb-8 space-y-4">
+        <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
           {/* Search Bar */}
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -75,41 +81,43 @@ export default function ExplorerPage() {
               placeholder="Search dApps..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 glass rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-monad-purple"
+              className="w-full pl-12 pr-4 py-3 sm:py-4 glass rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-monad-purple text-sm sm:text-base"
             />
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedCategory(null)}
-              className={`px-4 py-2 rounded-full text-sm transition-all ${
-                selectedCategory === null
-                  ? "bg-gradient-to-r from-monad-purple to-monad-blue text-white"
-                  : "glass text-gray-300 hover:text-white"
-              }`}
-            >
-              All
-            </button>
-            {categories.map((category) => (
+          {/* Filters - Horizontal scrollable on mobile */}
+          <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
+            <div className="flex flex-nowrap gap-2 min-w-min sm:flex-wrap">
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm transition-all ${
-                  selectedCategory === category
+                onClick={() => setSelectedCategory(null)}
+                className={`px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all ${
+                  selectedCategory === null
                     ? "bg-gradient-to-r from-monad-purple to-monad-blue text-white"
                     : "glass text-gray-300 hover:text-white"
                 }`}
               >
-                {category}
+                All
               </button>
-            ))}
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all ${
+                    selectedCategory === category
+                      ? "bg-gradient-to-r from-monad-purple to-monad-blue text-white"
+                      : "glass text-gray-300 hover:text-white"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              {filteredDApps.length} dApps found
+          <div className="flex justify-between items-center gap-2">
+            <p className="text-gray-400 text-xs sm:text-sm truncate">
+              {filteredDApps.length} dApps
             </p>
             <div className="flex gap-2">
               <button
@@ -140,7 +148,7 @@ export default function ExplorerPage() {
 
         {/* Main Content */}
         {viewMode === "3d" ? (
-          <div className="glass rounded-2xl overflow-hidden" style={{ height: "calc(100vh - 350px)", minHeight: "600px" }}>
+          <div className="glass rounded-2xl overflow-hidden relative" style={{ height: "min(70vh, 600px)", minHeight: "400px" }}>
             <Suspense
               fallback={
                 <div className="flex items-center justify-center h-full">
@@ -151,11 +159,11 @@ export default function ExplorerPage() {
               <NetworkGraph dapps={filteredDApps} onDAppClick={handleDAppClick} />
             </Suspense>
             
-            {/* 3D View Instructions */}
-            <div className="absolute bottom-8 left-8 glass rounded-xl p-4 max-w-xs">
+            {/* 3D View Instructions - Hidden on mobile, shown on desktop */}
+            <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8 glass rounded-xl p-3 sm:p-4 max-w-xs hidden sm:block">
               <div className="flex items-start gap-2">
-                <Info className="w-5 h-5 text-monad-purple mt-0.5" />
-                <div className="text-sm text-gray-300">
+                <Info className="w-5 h-5 text-monad-purple mt-0.5 flex-shrink-0" />
+                <div className="text-xs sm:text-sm text-gray-300">
                   <p className="font-semibold text-white mb-1">Explore in 3D</p>
                   <p>🖱️ Click & drag to rotate</p>
                   <p>🔍 Scroll to zoom</p>
@@ -165,7 +173,7 @@ export default function ExplorerPage() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
             {filteredDApps.map((dapp) => (
               <DAppCard key={dapp.id} dapp={dapp} onClick={handleDAppClick} />
             ))}
@@ -187,22 +195,22 @@ function DAppCard({ dapp, onClick }: { dapp: DApp; onClick: (dapp: DApp) => void
   return (
     <button
       onClick={() => onClick(dapp)}
-      className="glass rounded-xl p-6 hover:scale-105 transition-all duration-200 group text-left w-full"
+      className="glass rounded-xl p-4 sm:p-6 hover:scale-105 transition-all duration-200 group text-left w-full"
     >
-      <div className="flex items-start gap-4 mb-4">
+      <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
         <img
           src={dapp.logo}
           alt={dapp.name}
-          className="w-12 h-12 rounded-lg"
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex-shrink-0"
           onError={(e) => {
             (e.target as HTMLImageElement).src = "/placeholder.png";
           }}
         />
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white group-hover:text-monad-purple transition-colors">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base sm:text-lg font-semibold text-white group-hover:text-monad-purple transition-colors truncate">
             {dapp.name}
           </h3>
-          <div className="flex flex-wrap gap-2 mt-1">
+          <div className="flex flex-wrap gap-1 sm:gap-2 mt-1">
             {dapp.categories.slice(0, 2).map((cat) => (
               <span
                 key={cat}
@@ -215,11 +223,11 @@ function DAppCard({ dapp, onClick }: { dapp: DApp; onClick: (dapp: DApp) => void
         </div>
       </div>
 
-      <p className="text-sm text-gray-400 line-clamp-3 mb-4">
+      <p className="text-xs sm:text-sm text-gray-400 line-clamp-3 mb-3 sm:mb-4">
         {dapp.description}
       </p>
 
-      <div className="flex items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-xs flex-wrap">
         {dapp.isLive && (
           <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded">
             Live
