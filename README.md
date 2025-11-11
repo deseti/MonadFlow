@@ -28,27 +28,30 @@ MonadFlow is an immersive 3D discovery platform and AI-powered recommendation en
 - Smooth animations and transitions
 - Real-time data integration
 
-### 🤖 AI-Powered Recommendations
-- Smart recommendations based on wallet activity
-- Personalized discovery experience
-- "Users like you also use..." suggestions
-- Machine learning-powered insights
-
-### 🎮 Gamification
-- Explorer badges and achievements
-- Activity tracking and progress
-- Leaderboard system
-- Unlock rewards by discovering dApps
+### 🤖 AI Chatbot Assistant
+- Powered by Google Gemini API
+- Context-aware responses about Monad ecosystem
+- Real-time help and guidance
+- Supports English and Indonesian
+- Floating chat interface
 
 ### 🔍 Advanced Discovery
+- **Infinite Scroll**: Seamlessly load dApps as you explore
 - Filter by 15+ categories (DeFi, Gaming, NFT, AI, etc.)
-- Search functionality
-- "Only on Monad" filter
-- Live mainnet data integration
+- Smart search functionality
+- Grid and 3D view modes
+- 100+ dApps from official Monad ecosystem
+
+### 🎮 Interactive Features
+- Tour guide for first-time users
+- Smart recommendations panel
+- Live network statistics
+- Network pulse indicator
+- dApp detail modals with animations
 
 ### 📊 Live Data
 - Real-time TVL, volume, and user statistics
-- Direct integration with Monad mainnet protocols
+- Direct integration with Monad testnet protocols
 - Up-to-date ecosystem information
 
 ## 🛠 Tech Stack
@@ -70,8 +73,8 @@ MonadFlow is an immersive 3D discovery platform and AI-powered recommendation en
 - **TanStack Query** - Data fetching and caching
 
 ### AI/ML
-- **OpenAI API** - Smart recommendations
-- **Vercel AI SDK** - AI integration
+- **Google Gemini** - AI chatbot assistant
+- **Gemini Pro** - Natural language understanding
 
 ### Deployment
 - **Vercel** - Frontend hosting and serverless functions
@@ -100,17 +103,20 @@ MonadFlow is an immersive 3D discovery platform and AI-powered recommendation en
 
 3. **Setup environment variables**
    ```bash
-   cp .env.example .env.local
+   cp .env.local.example .env.local
    ```
 
 4. **Configure your `.env.local`**
    ```env
+   # WalletConnect Project ID (Required)
    NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_project_id
-   NEXT_PUBLIC_MONAD_RPC_URL=https://rpc.monad.xyz
-   OPENAI_API_KEY=your_openai_key
+   
+   # Google Gemini API Key (Required for AI Chatbot)
+   GEMINI_API_KEY=your_gemini_api_key
    ```
 
-   Get your WalletConnect Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com)
+   - Get your WalletConnect Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com)
+   - Get your Gemini API Key from [Google AI Studio](https://makersuite.google.com/app/apikey) (Free tier available)
 
 5. **Run the development server**
    ```bash
@@ -188,11 +194,12 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 ## 📊 Stats
 
-- 🎨 200+ dApps indexed
+- 🎨 100+ dApps indexed (from official Monad ecosystem)
 - 🏷️ 15+ categories
-- 🔴 Live mainnet data
-- 🎮 Gamified exploration
-- 🤖 AI-powered recommendations
+- 🔴 Live testnet data
+- 🎮 Interactive 3D exploration
+- 🤖 AI-powered chatbot assistant
+- ♾️ Infinite scroll for seamless discovery
 
 ---
 

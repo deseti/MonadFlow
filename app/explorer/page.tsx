@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import { dappsData, getCategories } from "@/lib/data/dapps";
 import { DApp } from "@/types";
 import { Search, Grid3x3, Network, Info } from "lucide-react";
@@ -11,6 +11,7 @@ import { StatsPanel } from "@/components/stats-panel";
 import { NetworkPulse } from "@/components/network-pulse";
 import { TourGuide } from "@/components/tour-guide";
 import { RecommendationPanel } from "@/components/recommendation-panel";
+import { AIChatbot } from "@/components/ai-chatbot";
 
 // Dynamically import 3D components (client-side only)
 const NetworkGraph = dynamic(
@@ -31,6 +32,10 @@ export default function ExplorerPage() {
   const [viewMode, setViewMode] = useState<"3d" | "grid">("3d"); // Always 3D by default!
   const [selectedDApp, setSelectedDApp] = useState<DApp | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Infinite scroll state
+  const [displayCount, setDisplayCount] = useState(12); // Initial load: 12 items
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const categories = getCategories();
 
@@ -46,6 +51,36 @@ export default function ExplorerPage() {
 
     return matchesSearch && matchesCategory;
   });
+
+  // Get displayed dApps (limited by displayCount)
+  const displayedDApps = filteredDApps.slice(0, displayCount);
+  const hasMore = displayCount < filteredDApps.length;
+
+  // Infinite scroll observer
+  useEffect(() => {
+    if (viewMode !== "grid") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          // Load 12 more items
+          setDisplayCount((prev) => prev + 12);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [viewMode, hasMore]);
+
+  // Reset display count when filters change
+  useEffect(() => {
+    setDisplayCount(12);
+  }, [searchQuery, selectedCategory]);
 
   const handleDAppClick = (dapp: DApp) => {
     setSelectedDApp(dapp);
@@ -119,7 +154,7 @@ export default function ExplorerPage() {
           {/* View Mode Toggle */}
           <div className="flex justify-between items-center gap-2">
             <p className="text-gray-400 text-xs sm:text-sm truncate">
-              {filteredDApps.length} dApps
+              {filteredDApps.length} dApps {viewMode === "grid" && displayedDApps.length < filteredDApps.length && `• Showing ${displayedDApps.length}`}
             </p>
             <div className="flex gap-2">
               <button
@@ -175,10 +210,31 @@ export default function ExplorerPage() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-            {filteredDApps.map((dapp) => (
-              <DAppCard key={dapp.id} dapp={dapp} onClick={handleDAppClick} />
-            ))}
+          <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+              {displayedDApps.map((dapp) => (
+                <DAppCard key={dapp.id} dapp={dapp} onClick={handleDAppClick} />
+              ))}
+            </div>
+            
+            {/* Infinite Scroll Trigger */}
+            {hasMore && (
+              <div ref={loadMoreRef} className="py-8 text-center">
+                <div className="inline-flex items-center gap-2 text-gray-400">
+                  <div className="w-2 h-2 bg-monad-purple rounded-full animate-pulse" />
+                  <span className="text-sm">Loading more...</span>
+                </div>
+              </div>
+            )}
+            
+            {/* End of Results */}
+            {!hasMore && filteredDApps.length > 12 && (
+              <div className="py-8 text-center">
+                <p className="text-gray-400 text-sm">
+                  ✨ You&apos;ve reached the end! {filteredDApps.length} dApps shown.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -206,6 +262,9 @@ export default function ExplorerPage() {
 
       {/* Interactive Tour Guide */}
       <TourGuide isFirstTime={true} />
+
+      {/* AI Chatbot Assistant */}
+      <AIChatbot />
     </main>
   );
 }

@@ -13,6 +13,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@rainbow-me/rainbowkit": "^2.1.7",
     "@react-three/drei": "^9.114.3",
     "@react-three/fiber": "^8.17.10",
