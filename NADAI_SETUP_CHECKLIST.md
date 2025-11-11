@@ -1,27 +1,27 @@
 # NadAI Quick Setup Checklist
 
-Ikuti checklist di bawah untuk setup NadAI dengan cepat:
+Follow this checklist to quickly set up NadAI:
 
 ## ✅ Step 1: Local Setup (Development)
 
-### 1.1 Pastikan `.env.local` sudah ada
+### 1.1 Ensure `.env.local` exists
 ```bash
 cd d:\user\MonadFlow
 ls -la .env.local
 ```
 
-### 1.2 Pastikan isi `.env.local` benar
+### 1.2 Verify `.env.local` contents
 ```env
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=7060c9633a9f83063b1a0c88f7740ff7
-GEMINI_API_KEY=your_gemini_api_key_here
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 ⚠️ **IMPORTANT:**
-- Ganti `your_gemini_api_key_here` dengan API key Anda dari https://makersuite.google.com/app/apikey
-- Jangan ada extra spaces: `GEMINI_API_KEY=AIzaSyD...` (correct)
-- Bukan `GEMINI_API_KEY = AIzaSyD...` (wrong - ada space)
-- Bukan `# GEMINI_API_KEY=...` (wrong - di-comment)
-- **JANGAN SHARE API KEY ANDA!** API key bersifat rahasia
+- Replace `your_openai_api_key_here` with your API key from https://platform.openai.com/api-keys
+- No extra spaces: `OPENAI_API_KEY=sk-proj...` (correct)
+- Not `OPENAI_API_KEY = sk-proj...` (wrong - has space)
+- Not `# OPENAI_API_KEY=...` (wrong - commented out)
+- **DO NOT SHARE YOUR API KEY!** API keys are confidential
 
 ### 1.3 Restart development server
 ```bash
@@ -30,20 +30,20 @@ npm run dev
 
 ### 1.4 Test locally
 1. Open http://localhost:3000/explorer
-2. Click sparkles button (bottom-right) untuk open NadAI
-3. Send message: "Halo NadAI!"
-4. Check untuk response
+2. Click sparkles button (bottom-right) to open NadAI
+3. Send message: "Hello NadAI!"
+4. Check for response
 
 ---
 
 ## ✅ Step 2: Vercel Deployment
 
-### 2.1 Push ke GitHub
+### 2.1 Push to GitHub
 ```bash
 git push origin main
 ```
 
-### 2.2 Set Environment Variables di Vercel
+### 2.2 Set Environment Variables in Vercel
 
 **Via Vercel Dashboard:**
 
@@ -51,110 +51,110 @@ git push origin main
 2. Click **MonadFlow** project
 3. Go to **Settings** → **Environment Variables**
 4. Click **Add New**
-5. Set ini untuk setiap environment (Production, Preview, Development):
+5. Set this for each environment (Production, Preview, Development):
 
-   **Name:** `GEMINI_API_KEY`
-   **Value:** `[Paste your API key dari https://makersuite.google.com/app/apikey]`
+   **Name:** `OPENAI_API_KEY`
+   **Value:** `[Paste your API key from https://platform.openai.com/api-keys]`
    **Environments:** ✅ Production, ✅ Preview, ✅ Development
 
 6. Click **Save**
 
-⚠️ **SECURITY:** Jangan copy-paste API key di chat atau dokumentasi publik!
+⚠️ **SECURITY:** Do not copy-paste API keys in chat or public documentation!
 
-### 2.3 Redeploy di Vercel
+### 2.3 Redeploy on Vercel
 
 Option A: Auto-redeploy
 ```bash
 git push origin main
 ```
-(Vercel akan auto-redeploy)
+(Vercel will auto-redeploy)
 
 Option B: Manual redeploy
 1. Go to Vercel Dashboard → **MonadFlow**
 2. Click **Deployments**
 3. Find latest deployment
 4. Click **...** → **Redeploy**
-5. Wait ~5 minutes untuk deployment selesai
+5. Wait ~5 minutes for deployment to complete
 
 ### 2.4 Test production
 1. Go to your Vercel URL: `https://monadflow-*.vercel.app`
 2. Click NadAI button
 3. Send test message
-4. Verify response dari NadAI
+4. Verify response from NadAI
 
 ---
 
 ## 🧪 Testing Checklist
 
-Pastikan semuanya berfungsi:
+Ensure everything works:
 
 - [ ] **Local Testing:**
-  - [ ] NadAI button muncul (bottom-right)
-  - [ ] Chat window bisa dibuka
-  - [ ] Bisa send message
-  - [ ] Receive response dari NadAI
-  - [ ] No error di browser console
+  - [ ] NadAI button appears (bottom-right)
+  - [ ] Chat window opens
+  - [ ] Can send message
+  - [ ] Receive response from NadAI
+  - [ ] No errors in browser console
 
 - [ ] **Vercel Testing:**
-  - [ ] Deployment selesai (status: Ready)
-  - [ ] Website bisa diakses
-  - [ ] NadAI button muncul
+  - [ ] Deployment complete (status: Ready)
+  - [ ] Website accessible
+  - [ ] NadAI button appears
   - [ ] Chat works
-  - [ ] Response dari NadAI muncul
+  - [ ] Response from NadAI appears
   - [ ] Check Network tab - `/api/chat` response status 200
 
 ---
 
 ## 🐛 If Something Goes Wrong
 
-### Error: "Gemini API key not configured"
+### Error: "OpenAI API key not configured"
 
 **Checklist:**
 1. `.env.local` exists locally? ✅
-2. `GEMINI_API_KEY=...` di `.env.local`? ✅
+2. `OPENAI_API_KEY=...` in `.env.local`? ✅
 3. Development server restarted? `npm run dev` ✅
-4. Vercel env vars di-set? Check Vercel dashboard ✅
-5. Vercel deployment selesai? ✅
+4. Vercel env vars set? Check Vercel dashboard ✅
+5. Vercel deployment complete? ✅
 
 ### Debug Steps:
-1. Press F12 di browser → Console tab
+1. Press F12 in browser → Console tab
 2. Click NadAI button
 3. Send message
-4. Look untuk error message
+4. Look for error message
 5. Copy error message
-6. Check `/docs/TROUBLESHOOTING_NADAI.md` untuk solusi
+6. Check `/docs/TROUBLESHOOTING_NADAI.md` for solutions
 
 ---
 
 ## 📱 Features to Test
 
-Test yang NadAI sudah implement:
+Test what NadAI has implemented:
 
-### ✅ Bilingual Support
-- Test: "Apa itu Monad?"
-- Test: "What is a dApp?"
-- NadAI should respond in same language
+### ✅ Multilingual Support
+- Test: "What is Monad?"
+- Test: "Show me DeFi projects"
+- NadAI responds intelligently
 
 ### ✅ Ecosystem Knowledge
-- "Berapa banyak dApps?"
+- "How many dApps are there?"
 - "Show me DeFi projects"
-- "Apa kategori yang ada?"
+- "What categories exist?"
 
 ### ✅ Platform Guidance
-- "Bagaimana cara pakai 3D view?"
+- "How do I use the 3D view?"
 - "How do I search dApps?"
-- "Apa itu infinite scroll?"
+- "What is infinite scroll?"
 
 ### ✅ Friendly Personality
-- Should use emojis
-- Should be conversational
-- Should encourage exploration
+- Uses emojis
+- Conversational
+- Encourages exploration
 
 ---
 
 ## 📝 Next Steps
 
-Setelah NadAI working:
+After NadAI is working:
 
 1. **Optional: Customize NadAI**
    - Edit `/app/api/chat/route.ts`
@@ -162,42 +162,42 @@ Setelah NadAI working:
    - Change personality/responses
 
 2. **Monitor Usage**
-   - Free Gemini API: 60 requests/min
-   - Check Google Cloud Console untuk quota
+   - Check OpenAI dashboard for usage
+   - Monitor API quota
 
-3. **Optional: Upgrade to Paid**
-   - Go to Google Cloud Console
-   - Enable billing
+3. **Optional: Upgrade Plan**
+   - Go to OpenAI dashboard
+   - Add billing
    - Get higher limits
 
 4. **Share & Promote**
-   - Tell team tentang NadAI
-   - Get feedback dari users
+   - Tell team about NadAI
+   - Get feedback from users
    - Iterate & improve
 
 ---
 
 ## 🔗 Useful Links
 
-- 📖 [NadAI Guide](./NADAI_GUIDE.md)
-- 🐛 [Troubleshooting](./TROUBLESHOOTING_NADAI.md)
+- 📖 [NadAI Guide](./docs/NADAI_GUIDE.md)
+- 🐛 [Troubleshooting](./docs/TROUBLESHOOTING_NADAI.md)
 - 🌐 [Monad Website](https://www.monad.xyz)
-- 🔑 [Gemini API Key](https://makersuite.google.com/app/apikey)
+- 🔑 [OpenAI API Keys](https://platform.openai.com/api-keys)
 - ✨ [Vercel Dashboard](https://vercel.com/dashboard)
 
 ---
 
 ## ❓ Questions?
 
-Jika masih ada masalah:
+If you still have issues:
 
-1. Check documentation di `/docs`
+1. Check documentation in `/docs`
 2. Check console logs (F12 → Console)
-3. Check Vercel logs di dashboard
-4. Create issue di GitHub dengan details
+3. Check Vercel logs in dashboard
+4. Create GitHub issue with details
 
 ---
 
 **NadAI Setup Complete! 🚀✨**
 
-Happy exploring dengan MonadFlow! 🌊
+Happy exploring with MonadFlow! 🌊

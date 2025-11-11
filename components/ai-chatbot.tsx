@@ -35,7 +35,19 @@ export function AIChatbot() {
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus();
+      // Prevent body scroll on mobile when chat is open
+      if (window.innerWidth < 768) {
+        document.body.classList.add('chat-open-mobile');
+      }
+    } else {
+      // Re-enable body scroll when chat closes
+      document.body.classList.remove('chat-open-mobile');
     }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('chat-open-mobile');
+    };
   }, [isOpen]);
 
   const sendMessage = async () => {
@@ -356,10 +368,11 @@ export function AIChatbot() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="md:hidden fixed inset-0 z-50 w-screen h-screen glass flex flex-col"
+            className="md:hidden fixed inset-0 z-50 w-screen glass flex flex-col mobile-full-height"
+            style={{ height: '100dvh' }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/30 backdrop-blur-md">
+            <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-white/10 bg-black/30 backdrop-blur-md safe-top">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-r from-monad-purple to-monad-blue rounded-full flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />
@@ -378,7 +391,7 @@ export function AIChatbot() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
               {messages.map((message, index) => (
                 <motion.div
                   key={index}
@@ -480,9 +493,9 @@ export function AIChatbot() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
-            <div className="p-4 border-t border-white/10 bg-black/30 backdrop-blur-md">
-              <div className="flex gap-2">
+            {/* Input - Fixed at bottom with safe area */}
+            <div className="flex-shrink-0 p-4 pb-6 border-t border-white/10 bg-black/40 backdrop-blur-md safe-bottom">
+              <div className="flex gap-2 items-center">
                 <input
                   ref={inputRef}
                   type="text"
@@ -491,12 +504,12 @@ export function AIChatbot() {
                   onKeyPress={handleKeyPress}
                   placeholder="Ask me anything..."
                   disabled={isLoading}
-                  className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-monad-purple transition-colors disabled:opacity-50"
+                  className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-monad-purple transition-colors disabled:opacity-50 text-base"
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || isLoading}
-                  className="w-10 h-10 bg-gradient-to-r from-monad-purple to-monad-blue rounded-xl flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
+                  className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-monad-purple to-monad-blue rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:hover:scale-100"
                 >
                   <Send className="w-5 h-5 text-white" />
                 </button>

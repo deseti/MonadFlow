@@ -2,7 +2,7 @@
 
 ## Overview
 
-**NadAI** is the specialized AI assistant for MonadFlow, powered by Google's Gemini API. NadAI is specifically trained to understand and guide users through the MonadFlow platform and the entire Monad blockchain ecosystem.
+**NadAI** is the specialized AI assistant for MonadFlow, powered by OpenAI's GPT models. NadAI is specifically trained to understand and guide users through the MonadFlow platform and the entire Monad blockchain ecosystem.
 
 ## Features
 
@@ -11,28 +11,28 @@
 - Explain Monad blockchain concepts
 - Guide users through the platform features
 - Recommend dApps based on user interests
-- Support both English and Indonesian (Bahasa Indonesia)
+- Provide intelligent conversational assistance
 - Provide real-time ecosystem insights
 
 ## Setup Instructions
 
-### 1. Get Your Gemini API Key
+### 1. Get Your OpenAI API Key
 
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Click "Create API Key"
-3. Copy your free tier API key
+1. Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Click "Create new secret key"
+3. Copy your API key
 
 ### 2. Add API Key to Environment
 
 In your `.env.local` file:
 
 ```env
-GEMINI_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_api_key_here
 ```
 
 Example:
 ```env
-GEMINI_API_KEY=AIzaSyD6__tr_RmF1cNSGCMHiXY7B5SDWMy1GQM
+OPENAI_API_KEY=sk-proj-your_actual_key_here
 ```
 
 ### 3. Verify Setup
@@ -49,10 +49,10 @@ GEMINI_API_KEY=AIzaSyD6__tr_RmF1cNSGCMHiXY7B5SDWMy1GQM
 4. Click it to open NadAI chat window
 
 5. Try asking questions like:
-   - "Apa itu MonadFlow?" (What is MonadFlow?)
-   - "Tunjukkan dApps DeFi terbaik" (Show me the best DeFi dApps)
+   - "What is MonadFlow?"
+   - "Show me the best DeFi dApps"
    - "How does the 3D visualization work?"
-   - "Berapa banyak kategori yang ada?" (How many categories are there?)
+   - "How many categories are there?"
 
 ## NadAI Knowledge Base
 
@@ -88,14 +88,14 @@ NadAI has comprehensive knowledge about:
 
 ### Example 1: DApp Discovery
 ```
-User: "Saya mau cari DeFi protocol terbaik"
-NadAI: "Di MonadFlow kami punya 30+ DeFi protocols! Beberapa yang popular:
-- Ambient: AMM dengan liquidity types yang fleksibel
-- Apriori: MEV infrastructure dan liquid staking
+User: "I want to find the best DeFi protocol"
+NadAI: "In MonadFlow we have 30+ DeFi protocols! Some popular ones:
+- Ambient: AMM with flexible liquidity types
+- Apriori: MEV infrastructure and liquid staking
 - Drake: Advanced trading features
 - Euler: Lending protocol
 
-Mana yang paling menarik untuk Anda? Saya bisa jelaskan lebih detail!"
+Which one interests you most? I can explain in more detail!"
 ```
 
 ### Example 2: Platform Guide
@@ -113,8 +113,8 @@ Try it out and discover something cool! 🚀"
 
 ### Example 3: Category Exploration
 ```
-User: "Ada berapa banyak kategori?"
-NadAI: "Kami punya 15+ kategori yang lengkap:
+User: "How many categories are there?"
+NadAI: "We have 15+ comprehensive categories:
 1. DeFi (30+ dApps)
 2. Wallets (8+ dApps)
 3. AI (8+ dApps)
@@ -123,9 +123,9 @@ NadAI: "Kami punya 15+ kategori yang lengkap:
 6. NFTs & Social (8+ dApps)
 7. Oracles & Infrastructure (10+ dApps)
 8. Cross-chain (8+ dApps)
-...dan banyak lagi!
+...and many more!
 
-Kategori apa yang paling Anda minati?"
+Which category interests you most?"
 ```
 
 ## Personality & Tone
@@ -137,12 +137,12 @@ NadAI communicates with:
 - ✅ Clear, easy-to-understand explanations
 - ✅ Patience with beginners
 - ✅ Respect for experienced users
-- ✅ Bilingual support (English & Indonesian)
+- ✅ Professional English communication
 
 ## Technical Details
 
 ### Architecture
-- **AI Model**: Google Gemini Pro
+- **AI Model**: OpenAI GPT-3.5-turbo
 - **Hosting**: Vercel serverless function
 - **Route**: `/api/chat` (POST)
 - **Frontend**: React component with Framer Motion animations
@@ -174,27 +174,27 @@ To modify NadAI's behavior:
 
 ## Troubleshooting
 
-### "Gemini API key not configured"
+### "OpenAI API key not configured"
 - Check `.env.local` file exists
-- Verify `GEMINI_API_KEY` is set correctly
+- Verify `OPENAI_API_KEY` is set correctly
 - Restart development server after adding key
 
 ### Chat not responding
 - Check browser console for error messages
-- Verify API key is valid and has quota remaining
+- Verify API key is valid and has credits remaining
 - Check network tab in DevTools for `/api/chat` request
 
 ### Slow responses
-- Gemini API free tier has rate limits
-- Paid tier is available for higher volume
+- OpenAI API may have rate limits depending on your tier
+- Check your usage at https://platform.openai.com/usage
 - Consider response caching for better UX
 
 ## Pricing
 
-- **Free Tier**: 60 requests per minute
-- **Paid Tier**: Higher limits with subscription
+- **Tier 1**: 3 RPM (requests per minute)
+- **Higher Tiers**: More requests with usage-based billing
 
-For MonadFlow's use case, the free tier is perfect for demo and development!
+Check [OpenAI Pricing](https://openai.com/pricing) for current rates.
 
 ## Support
 

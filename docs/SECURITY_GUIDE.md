@@ -2,67 +2,67 @@
 
 ## Important: API Keys are Sensitive!
 
-Jangan pernah expose API keys Anda ke publik. Berikut best practices:
+Never expose your API keys to the public. Follow these best practices:
 
 ---
 
-## ✅ Aman: `.env.local` (Local Only)
+## ✅ Safe: `.env.local` (Local Only)
 
-File `.env.local` adalah **SAFE** karena:
-- Di `.gitignore` → tidak akan di-push ke GitHub
-- Hanya di komputer Anda sendiri
-- Tidak bisa diakses dari GitHub repository
+The `.env.local` file is **SAFE** because:
+- In `.gitignore` → won't be pushed to GitHub
+- Only on your computer
+- Cannot be accessed from GitHub repository
 
 ```env
-# ✅ SAFE - hanya di komputer Anda
-GEMINI_API_KEY=AIzaSyD6__tr_RmF1cNSGCMHiXY7B5SDWMy1GQM
+# ✅ SAFE - only on your computer
+OPENAI_API_KEY=sk-proj-your_key_here
 ```
 
 ---
 
-## ❌ JANGAN: Push API Keys ke GitHub
+## ❌ DON'T: Push API Keys to GitHub
 
-**BAHAYA!** Jangan pernah push API keys ke repository:
+**DANGEROUS!** Never push API keys to repository:
 
 ```env
-# ❌ BERBAHAYA - jangan commit ini!
-GEMINI_API_KEY=AIzaSyD6__tr_RmF1cNSGCMHiXY7B5SDWMy1GQM
+# ❌ DANGEROUS - don't commit this!
+OPENAI_API_KEY=sk-proj-real_key_here
 ```
 
-**Kenapa berbahaya?**
-- Anyone dapat akses API key Anda
-- Orang bisa abuse quota Anda
-- Bisa kena tagihan mahal
-- GitHub memindai leaked keys secara otomatis
+**Why is it dangerous?**
+- Anyone can access your API key
+- People can abuse your quota
+- You can get high bills
+- GitHub automatically scans for leaked keys
 
 ---
 
-## ✅ Aman: Vercel Environment Variables (Production)
+## ✅ Safe: Vercel Environment Variables (Production)
 
-Untuk production di Vercel, use **Vercel Environment Variables**:
+For production on Vercel, use **Vercel Environment Variables**:
 
 1. Go to Vercel Dashboard → Settings → Environment Variables
-2. Add variable securely di Vercel (bukan di GitHub)
-3. Vercel automatically inject ke production
+2. Add variables securely in Vercel (not in GitHub)
+3. Vercel automatically injects into production
 
-**Keuntungan:**
-- ✅ Tersimpan aman di Vercel
-- ✅ Tidak pernah di-expose ke public
-- ✅ Hanya digunakan saat production
-- ✅ Bisa di-rotate kapan saja
+**Benefits:**
+- ✅ Stored securely in Vercel
+- ✅ Never exposed to public
+- ✅ Only used in production
+- ✅ Can be rotated anytime
 
 ---
 
-## ✅ Aman: `.env.local.example` (Template Only)
+## ✅ Safe: `.env.local.example` (Template Only)
 
-File `.env.local.example` adalah **SAFE** karena:
-- Tidak punya nilai asli, hanya placeholder
-- Berfungsi sebagai template untuk developer lain
-- Orang tahu harus replace dengan nilai mereka sendiri
+The `.env.local.example` file is **SAFE** because:
+- Has no real values, only placeholders
+- Functions as a template for other developers
+- People know to replace with their own values
 
 ```env
-# ✅ SAFE - template saja, bukan nilai asli
-GEMINI_API_KEY=your_gemini_api_key_here
+# ✅ SAFE - template only, not real values
+OPENAI_API_KEY=your_openai_api_key_here
 NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_wallet_connect_id_here
 ```
 
@@ -70,25 +70,25 @@ NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_wallet_connect_id_here
 
 ## 🚨 If Accidentally Exposed
 
-**Jika API key terekspos di GitHub:**
+**If API key is exposed on GitHub:**
 
-1. **SEGERA disable API key:**
-   - Go to https://makersuite.google.com/app/apikey
+1. **IMMEDIATELY disable API key:**
+   - Go to https://platform.openai.com/api-keys
    - Delete the exposed key
    - Create NEW key
 
-2. **Check untuk unauthorized usage:**
-   - Go to Google Cloud Console
-   - Check "Quota & Usage" untuk suspicious activity
-   - Check billing untuk unexpected charges
+2. **Check for unauthorized usage:**
+   - Go to OpenAI dashboard
+   - Check "Usage" for suspicious activity
+   - Check billing for unexpected charges
 
-3. **Update di Vercel:**
+3. **Update in Vercel:**
    - Go to Vercel → Settings → Environment Variables
-   - Update GEMINI_API_KEY dengan NEW key
+   - Update OPENAI_API_KEY with NEW key
    - Redeploy
 
 4. **Git history cleanup (Advanced):**
-   - Use `git filter-branch` untuk remove dari history
+   - Use `git filter-branch` to remove from history
    - Better: Use GitHub's remove sensitive data tool
 
 ---
@@ -132,21 +132,21 @@ git status
 ## 🔗 Resources
 
 - [GitHub: Protecting sensitive data](https://docs.github.com/en/code-security/secret-scanning)
-- [Google: API Security Best Practices](https://cloud.google.com/docs/authentication/api-keys)
+- [OpenAI: API Security Best Practices](https://platform.openai.com/docs/guides/safety-best-practices)
 - [Vercel: Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)
 
 ---
 
 ## Team Guidelines
 
-Untuk tim development:
+For development teams:
 
 1. **Never commit `.env.local`** to version control
-2. **Never share API keys** in chat, email, atau dokumentasi publik
-3. **Always use `.env.local.example`** sebagai template
-4. **Each developer** punya `.env.local` mereka sendiri
-5. **Production** menggunakan Vercel Environment Variables
-6. **Rotate keys** regularly untuk enhanced security
+2. **Never share API keys** in chat, email, or public documentation
+3. **Always use `.env.local.example`** as a template
+4. **Each developer** has their own `.env.local`
+5. **Production** uses Vercel Environment Variables
+6. **Rotate keys** regularly for enhanced security
 
 ---
 
