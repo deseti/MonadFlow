@@ -155,7 +155,15 @@ npm run dev
 6. Restart npm run dev
 ```
 
-### Issue 3: Error on Vercel but works locally
+### Issue 3: "gemini-pro is not found"
+
+**Solution:**
+- This error means the model is not supported in v1beta
+- Solution: Use `gemini-1.5-flash` instead (already updated in code)
+- Clear browser cache: Press Ctrl+Shift+Delete → Clear Cache
+- Refresh page: Ctrl+R
+
+### Issue 4: Error on Vercel but works locally
 
 **Solution:**
 ```
