@@ -166,8 +166,8 @@ export async function POST(req: NextRequest) {
 
     console.log("✅ GEMINI_API_KEY found, initializing Gemini API...");
 
-    // Initialize the model
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Initialize the model (using gemini-1.5-flash for best compatibility)
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // Build conversation history with NadAI system prompt
     const chat = model.startChat({
