@@ -154,11 +154,17 @@ export async function POST(req: NextRequest) {
 
     // Check if API key is configured
     if (!process.env.GEMINI_API_KEY) {
+      console.error("❌ GEMINI_API_KEY not found in environment variables");
       return NextResponse.json(
-        { error: "Gemini API key not configured" },
+        { 
+          error: "Gemini API key not configured. Please add GEMINI_API_KEY to environment variables.",
+          debug: "Missing GEMINI_API_KEY"
+        },
         { status: 500 }
       );
     }
+
+    console.log("✅ GEMINI_API_KEY found, initializing Gemini API...");
 
     // Initialize the model
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
@@ -181,19 +187,31 @@ export async function POST(req: NextRequest) {
       ],
     });
 
+    console.log("📤 Sending message to Gemini API...", { messageLength: message.length });
+
     // Send message and get response
     const result = await chat.sendMessage(message);
     const response = await result.response;
     const text = response.text();
+
+    console.log("✅ Response received from Gemini API", { responseLength: text.length });
 
     return NextResponse.json({
       response: text,
       success: true,
     });
   } catch (error: any) {
-    console.error("NadAI Chat API error:", error);
+    console.error("❌ NadAI Chat API error:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+    });
+    
     return NextResponse.json(
-      { error: error.message || "Failed to process chat message" },
+      { 
+        error: error.message || "Failed to process chat message",
+        debug: process.env.NODE_ENV === "development" ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

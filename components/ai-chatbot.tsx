@@ -69,7 +69,7 @@ export function AIChatbot() {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (data.success && data.response) {
         const assistantMessage: Message = {
           role: "assistant",
           content: data.response,
@@ -77,16 +77,18 @@ export function AIChatbot() {
         };
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
-        throw new Error(data.error || "Failed to get response");
+        const errorMsg = data.error || "Failed to get response from NadAI";
+        console.error("API Error:", { status: response.status, error: errorMsg, debug: data.debug });
+        throw new Error(errorMsg);
       }
     } catch (error: any) {
       const errorMessage: Message = {
         role: "assistant",
-        content: "Sorry, I encountered an error. Please make sure the Gemini API key is configured correctly. 😔",
+        content: `❌ Maaf, terjadi kesalahan: ${error.message}\n\n💡 Tips:\n• Pastikan GEMINI_API_KEY sudah di-set di Vercel environment\n• Coba refresh halaman\n• Cek koneksi internet Anda\n\n🔧 Error details: ${error.message}`,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
-      console.error("Chat error:", error);
+      console.error("Chat error details:", error);
     } finally {
       setIsLoading(false);
     }
