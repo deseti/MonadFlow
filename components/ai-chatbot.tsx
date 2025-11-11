@@ -112,6 +112,7 @@ export function AIChatbot() {
             className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-monad-purple to-monad-blue rounded-full shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center group"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
+            title="Chat with NadAI"
           >
             <Sparkles className="w-6 h-6 text-white group-hover:rotate-12 transition-transform" />
             <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
@@ -135,8 +136,8 @@ export function AIChatbot() {
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold">MonadFlow AI</h3>
-                  <p className="text-xs text-gray-400">Powered by Gemini</p>
+                  <h3 className="text-white font-semibold">NadAI</h3>
+                  <p className="text-xs text-gray-400">MonadFlow Guide</p>
                 </div>
               </div>
               <button
@@ -220,7 +221,7 @@ export function AIChatbot() {
                 </button>
               </div>
               <p className="text-xs text-gray-500 mt-2 text-center">
-                Powered by Google Gemini • Press Enter to send
+                NadAI - Your MonadFlow Guide • Press Enter to send
               </p>
             </div>
           </motion.div>
