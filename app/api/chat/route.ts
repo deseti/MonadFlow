@@ -1,9 +1,11 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
 import { dappsData, getCategories } from "@/lib/data/dapps";
 
-// Initialize Gemini API
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+// Initialize OpenAI API
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // NadAI - MonadFlow's specialized AI assistant personality & knowledge base
 const getNadAISystemPrompt = () => {
@@ -72,7 +74,7 @@ ${Object.entries(dappsByCategory).map(([cat, apps]: any) =>
 - Casual & approachable (like a friend, not a bot)
 - Uses relevant emojis to enhance communication
 - Patient with beginners, respect for experienced users
-- Bilingual: Excellent in both English and Indonesian (Bahasa Indonesia)
+- Excellent in both English and other languages when asked
 - Always enthusiastic about Monad and Web3
 
 **What you DON'T do:**
@@ -129,9 +131,7 @@ A: Yes! Use the "Connect Wallet" button to link your wallet for a personalized e
 🌐 LANGUAGE GUIDELINES
 ═══════════════════════════════════════════════════════════════
 
-- Respond in the SAME language as the user
-- If they write in Indonesian (Bahasa Indonesia), respond in Indonesian
-- If they write in English, respond in English
+- Respond in clear, professional English
 - Keep responses conversational but informative
 - Use line breaks and formatting for readability
 - Aim for 150-300 words per response (unless asked for more details)
@@ -153,64 +153,68 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if API key is configured
-    if (!process.env.GEMINI_API_KEY) {
-      console.error("❌ GEMINI_API_KEY not found in environment variables");
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("❌ OPENAI_API_KEY not found in environment variables");
       return NextResponse.json(
         { 
-          error: "Gemini API key not configured. Please add GEMINI_API_KEY to environment variables.",
-          debug: "Missing GEMINI_API_KEY"
+          error: "OpenAI API key not configured. Please add OPENAI_API_KEY to environment variables.",
+          debug: "Missing OPENAI_API_KEY"
         },
         { status: 500 }
       );
     }
 
-    console.log("✅ GEMINI_API_KEY found, initializing Gemini API...");
+    console.log("✅ OPENAI_API_KEY found, initializing OpenAI API...");
 
-    // Initialize the model (using gemini-1.5-pro which is available in v1 API)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    // Build conversation messages
+    const messages: any[] = [
+      {
+        role: "system",
+        content: getNadAISystemPrompt(),
+      },
+      ...history.map((msg: any) => ({
+        role: msg.role === "user" ? "user" : "assistant",
+        content: msg.content,
+      })),
+      {
+        role: "user",
+        content: message.trim(),
+      },
+    ];
 
-    // Build conversation history with NadAI system prompt
-    const chat = model.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [{ text: getNadAISystemPrompt() }],
-        },
-        {
-          role: "model",
-          parts: [{ text: "Ready! 🚀 I'm NadAI, the official AI assistant for MonadFlow. I'm here to help you explore the Monad ecosystem. Ask me anything about dApps, blockchain, or how to use this platform. What would you like to know? ✨" }],
-        },
-        ...history.map((msg: any) => ({
-          role: msg.role === "user" ? "user" : "model",
-          parts: [{ text: msg.content }],
-        })),
-      ],
+    console.log("📤 Sending message to OpenAI API...", { messageLength: message.length });
+
+    // Send message to OpenAI
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 1024,
     });
 
-    console.log("📤 Sending message to Gemini API...", { messageLength: message.length });
+    const responseText = response.choices[0]?.message?.content;
 
-    // Send message and get response
-    const result = await chat.sendMessage(message);
-    const response = await result.response;
-    const text = response.text();
+    if (!responseText) {
+      throw new Error("No response from OpenAI API");
+    }
 
-    console.log("✅ Response received from Gemini API", { responseLength: text.length });
+    console.log("✅ Response received from OpenAI API", { responseLength: responseText.length });
 
     return NextResponse.json({
-      response: text,
+      response: responseText,
       success: true,
     });
   } catch (error: any) {
     console.error("❌ NadAI Chat API error:", {
       message: error.message,
       name: error.name,
-      stack: error.stack,
+      status: error.status,
     });
     
     return NextResponse.json(
       { 
         error: error.message || "Failed to process chat message",
-        debug: process.env.NODE_ENV === "development" ? error.stack : undefined
+        debug: process.env.NODE_ENV === "development" ? error.message : undefined
       },
       { status: 500 }
     );
