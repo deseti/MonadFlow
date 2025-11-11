@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Line } from "@react-three/drei";
 import * as THREE from "three";
 
 interface ConnectionLineProps {
@@ -22,26 +21,36 @@ export function ConnectionLine({
   color = "#8B5CF6",
   opacity = 0.3,
 }: ConnectionLineProps) {
-  const lineRef = useRef<THREE.Line>(null);
+  const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
-    if (lineRef.current) {
-      // Pulse animation
-      const material = lineRef.current.material as THREE.LineBasicMaterial;
-      if (material) {
+    if (groupRef.current && groupRef.current.children[0]) {
+      const line = groupRef.current.children[0] as THREE.Line;
+      const material = line.material as THREE.LineBasicMaterial;
+      if (material && material.opacity !== undefined) {
         material.opacity = opacity * (0.5 + Math.sin(state.clock.elapsedTime * 2) * 0.3);
       }
     }
   });
 
   return (
-    <Line
-      ref={lineRef}
-      points={[start, end]}
-      color={color}
-      lineWidth={1.5}
-      transparent
-      opacity={opacity}
-    />
+    <group ref={groupRef}>
+      <line>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([start[0], start[1], start[2], end[0], end[1], end[2]])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial
+          color={color}
+          transparent
+          opacity={opacity}
+          linewidth={1.5}
+        />
+      </line>
+    </group>
   );
 }

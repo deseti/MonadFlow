@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Zap, Target } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 /**
  * Loading screen with animations
