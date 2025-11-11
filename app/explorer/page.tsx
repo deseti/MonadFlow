@@ -1,15 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { dappsData, getCategories } from "@/lib/data/dapps";
 import { DApp } from "@/types";
-import { Search, Filter, Grid3x3, Network } from "lucide-react";
+import { Search, Grid3x3, Network, Info } from "lucide-react";
 import { ConnectWallet } from "@/components/connect-wallet";
+import dynamic from "next/dynamic";
+import { DAppDetailModal } from "@/components/dapp-detail-modal";
+
+// Dynamically import 3D components (client-side only)
+const NetworkGraph = dynamic(
+  () => import("@/components/3d/network-graph").then((mod) => mod.NetworkGraph),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-white text-lg">Loading 3D View...</div>
+      </div>
+    ),
+  }
+);
 
 export default function ExplorerPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "3d">("grid");
+  const [viewMode, setViewMode] = useState<"3d" | "grid">("3d"); // 3D as default!
+  const [selectedDApp, setSelectedDApp] = useState<DApp | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const categories = getCategories();
 
@@ -25,6 +42,11 @@ export default function ExplorerPage() {
 
     return matchesSearch && matchesCategory;
   });
+
+  const handleDAppClick = (dapp: DApp) => {
+    setSelectedDApp(dapp);
+    setIsModalOpen(true);
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
@@ -91,61 +113,81 @@ export default function ExplorerPage() {
             </p>
             <div className="flex gap-2">
               <button
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-lg transition-all ${
-                  viewMode === "grid"
-                    ? "bg-monad-purple text-white"
-                    : "glass text-gray-400"
-                }`}
-              >
-                <Grid3x3 className="w-5 h-5" />
-              </button>
-              <button
                 onClick={() => setViewMode("3d")}
                 className={`p-2 rounded-lg transition-all ${
                   viewMode === "3d"
                     ? "bg-monad-purple text-white"
                     : "glass text-gray-400"
                 }`}
+                title="3D Network View"
               >
                 <Network className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-2 rounded-lg transition-all ${
+                  viewMode === "grid"
+                    ? "bg-monad-purple text-white"
+                    : "glass text-gray-400"
+                }`}
+                title="Grid View"
+              >
+                <Grid3x3 className="w-5 h-5" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* DApps Grid */}
-        {viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredDApps.map((dapp) => (
-              <DAppCard key={dapp.id} dapp={dapp} />
-            ))}
+        {/* Main Content */}
+        {viewMode === "3d" ? (
+          <div className="glass rounded-2xl overflow-hidden" style={{ height: "calc(100vh - 350px)", minHeight: "600px" }}>
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-white text-lg">Loading 3D Experience...</div>
+                </div>
+              }
+            >
+              <NetworkGraph dapps={filteredDApps} onDAppClick={handleDAppClick} />
+            </Suspense>
+            
+            {/* 3D View Instructions */}
+            <div className="absolute bottom-8 left-8 glass rounded-xl p-4 max-w-xs">
+              <div className="flex items-start gap-2">
+                <Info className="w-5 h-5 text-monad-purple mt-0.5" />
+                <div className="text-sm text-gray-300">
+                  <p className="font-semibold text-white mb-1">Explore in 3D</p>
+                  <p>🖱️ Click & drag to rotate</p>
+                  <p>🔍 Scroll to zoom</p>
+                  <p>✨ Click nodes for details</p>
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="glass rounded-2xl p-8 flex items-center justify-center min-h-[600px]">
-            <div className="text-center">
-              <Network className="w-16 h-16 text-monad-purple mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">
-                3D View Coming Soon
-              </h3>
-              <p className="text-gray-400">
-                Interactive 3D network graph visualization in development
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredDApps.map((dapp) => (
+              <DAppCard key={dapp.id} dapp={dapp} onClick={handleDAppClick} />
+            ))}
           </div>
         )}
       </div>
+
+      {/* dApp Detail Modal */}
+      <DAppDetailModal
+        dapp={selectedDApp}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </main>
   );
 }
 
-function DAppCard({ dapp }: { dapp: DApp }) {
+function DAppCard({ dapp, onClick }: { dapp: DApp; onClick: (dapp: DApp) => void }) {
   return (
-    <a
-      href={dapp.website}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="glass rounded-xl p-6 hover:scale-105 transition-all duration-200 group"
+    <button
+      onClick={() => onClick(dapp)}
+      className="glass rounded-xl p-6 hover:scale-105 transition-all duration-200 group text-left w-full"
     >
       <div className="flex items-start gap-4 mb-4">
         <img
@@ -189,6 +231,6 @@ function DAppCard({ dapp }: { dapp: DApp }) {
           </span>
         )}
       </div>
-    </a>
+    </button>
   );
 }
