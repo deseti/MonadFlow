@@ -1,219 +1,325 @@
+"use client";
+
+import { useState, Suspense, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Network, Brain, Zap, BarChart3 } from "lucide-react";
+import { dappsData, getCategories } from "@/lib/data/dapps";
+import { DApp } from "@/types";
+import { Search, Grid3x3, Network, Info } from "lucide-react";
 import { ConnectWallet } from "@/components/connect-wallet";
+import dynamic from "next/dynamic";
+import { DAppDetailModal } from "@/components/dapp-detail-modal";
+import { StatsPanel } from "@/components/stats-panel";
+import { NetworkPulse } from "@/components/network-pulse";
+import { TourGuide } from "@/components/tour-guide";
+import { RecommendationPanel } from "@/components/recommendation-panel";
+import { AIChatbot } from "@/components/ai-chatbot";
+
+// Dynamically import 3D components (client-side only)
+const NetworkGraph = dynamic(
+  () => import("@/components/3d/network-graph").then((mod) => mod.NetworkGraph),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-white text-lg">Loading 3D Experience...</div>
+      </div>
+    ),
+  }
+);
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"3d" | "grid">("3d"); // 3D by default - THE MAGIC!
+  const [selectedDApp, setSelectedDApp] = useState<DApp | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Infinite scroll state
+  const [displayCount, setDisplayCount] = useState(12);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const categories = getCategories();
+
+  // Filter dApps based on search and category
+  const filteredDApps = dappsData.filter((dapp) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      dapp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dapp.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCategory =
+      !selectedCategory || dapp.categories.includes(selectedCategory as any);
+
+    return matchesSearch && matchesCategory;
+  });
+
+  // Get displayed dApps (limited by displayCount)
+  const displayedDApps = filteredDApps.slice(0, displayCount);
+  const hasMore = displayCount < filteredDApps.length;
+
+  // Infinite scroll observer
+  useEffect(() => {
+    if (viewMode !== "grid") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setDisplayCount((prev) => prev + 12);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [viewMode, hasMore]);
+
+  // Reset display count when filters change
+  useEffect(() => {
+    setDisplayCount(12);
+  }, [searchQuery, selectedCategory]);
+
+  const handleDAppClick = (dapp: DApp) => {
+    setSelectedDApp(dapp);
+    setIsModalOpen(true);
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 py-20">
-        <div className="flex flex-col items-center justify-center text-center space-y-8">
-          {/* Logo/Title */}
-          <div className="space-y-4">
-            <h1 className="text-6xl md:text-8xl font-bold gradient-text">
+      {/* Header */}
+      <header className="border-b border-white/10 backdrop-blur-lg sticky top-0 z-50">
+        <div className="container mx-auto px-3 sm:px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="text-2xl font-bold gradient-text">
               MonadFlow
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl">
-              Discover the Monad ecosystem in stunning 3D. 
-              Immersive exploration. Real-time analytics. All in one place.
-            </p>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <Link
-              href="/explorer"
-              className="group px-8 py-4 bg-gradient-to-r from-monad-purple to-monad-blue rounded-lg font-semibold text-white hover:scale-105 transition-transform duration-200 flex items-center justify-center gap-2"
-            >
-              Enter 3D Explorer
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <div className="flex justify-center">
+            <div className="flex items-center gap-4">
+              <Link href="/about" className="hidden sm:block text-gray-300 hover:text-white transition text-sm">
+                About
+              </Link>
+              <NetworkPulse />
               <ConnectWallet />
             </div>
           </div>
+        </div>
+      </header>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl w-full">
-            <div className="glass p-6 rounded-xl text-center">
-              <div className="text-4xl font-bold gradient-text">100+</div>
-              <div className="text-gray-400 text-sm mt-2">dApps</div>
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        {/* Live Stats Panel */}
+        <StatsPanel />
+
+        {/* Search and Filters */}
+        <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search dApps..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 sm:py-4 glass rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-monad-purple text-sm sm:text-base"
+            />
+          </div>
+
+          {/* Filters - Horizontal scrollable on mobile */}
+          <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
+            <div className="flex flex-nowrap gap-2 min-w-min sm:flex-wrap">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all ${
+                  selectedCategory === null
+                    ? "bg-gradient-to-r from-monad-purple to-monad-blue text-white"
+                    : "glass text-gray-300 hover:text-white"
+                }`}
+              >
+                All
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all ${
+                    selectedCategory === category
+                      ? "bg-gradient-to-r from-monad-purple to-monad-blue text-white"
+                      : "glass text-gray-300 hover:text-white"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
             </div>
-            <div className="glass p-6 rounded-xl text-center">
-              <div className="text-4xl font-bold gradient-text">15+</div>
-              <div className="text-gray-400 text-sm mt-2">Categories</div>
-            </div>
-            <div className="glass p-6 rounded-xl text-center">
-              <div className="text-4xl font-bold gradient-text">Live</div>
-              <div className="text-gray-400 text-sm mt-2">on Testnet</div>
+          </div>
+
+          {/* View Mode Toggle */}
+          <div className="flex justify-between items-center gap-2">
+            <p className="text-gray-400 text-xs sm:text-sm truncate">
+              {filteredDApps.length} dApps {viewMode === "grid" && displayedDApps.length < filteredDApps.length && `• Showing ${displayedDApps.length}`}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setViewMode("3d")}
+                className={`p-2 rounded-lg transition-all ${
+                  viewMode === "3d"
+                    ? "bg-monad-purple text-white"
+                    : "glass text-gray-400"
+                }`}
+                title="3D Network View"
+              >
+                <Network className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-2 rounded-lg transition-all ${
+                  viewMode === "grid"
+                    ? "bg-monad-purple text-white"
+                    : "glass text-gray-400"
+                }`}
+                title="Grid View"
+              >
+                <Grid3x3 className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Main Content */}
+        {viewMode === "3d" ? (
+          <div className="glass rounded-2xl overflow-hidden relative" style={{ height: "min(70vh, 600px)", minHeight: "400px" }}>
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-white text-lg">Loading 3D Experience...</div>
+                </div>
+              }
+            >
+              <NetworkGraph dapps={filteredDApps} onDAppClick={handleDAppClick} />
+            </Suspense>
+            
+            {/* 3D View Instructions - Hidden on mobile, shown on desktop */}
+            <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8 glass rounded-xl p-3 sm:p-4 max-w-xs hidden sm:block">
+              <div className="flex items-start gap-2">
+                <Info className="w-5 h-5 text-monad-purple mt-0.5 flex-shrink-0" />
+                <div className="text-xs sm:text-sm text-gray-300">
+                  <p className="font-semibold text-white mb-1">Explore in 3D</p>
+                  <p>🖱️ Click & drag to rotate</p>
+                  <p>🔍 Scroll to zoom</p>
+                  <p>✨ Click nodes for details</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+              {displayedDApps.map((dapp) => (
+                <DAppCard key={dapp.id} dapp={dapp} onClick={handleDAppClick} />
+              ))}
+            </div>
+            
+            {/* Infinite Scroll Trigger */}
+            {hasMore && (
+              <div ref={loadMoreRef} className="py-8 text-center">
+                <div className="inline-flex items-center gap-2 text-gray-400">
+                  <div className="w-2 h-2 bg-monad-purple rounded-full animate-pulse" />
+                  <span className="text-sm">Loading more...</span>
+                </div>
+              </div>
+            )}
+            
+            {/* End of Results */}
+            {!hasMore && filteredDApps.length > 12 && (
+              <div className="py-8 text-center">
+                <p className="text-gray-400 text-sm">
+                  ✨ You&apos;ve reached the end! {filteredDApps.length} dApps shown.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Features Section */}
-      <div className="container mx-auto px-4 py-20">
-        <h2 className="text-4xl font-bold text-center mb-16 gradient-text">
-          Platform Features
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Feature 1: 3D Network */}
-          <Link href="/explorer" className="group">
-            <div className="glass p-8 rounded-2xl hover:border-monad-purple/50 border border-transparent transition-all duration-300 hover:scale-105 h-full cursor-pointer">
-              <div className="flex items-center gap-3 mb-4">
-                <Network className="w-8 h-8 text-monad-purple" />
-                <h3 className="text-2xl font-bold text-white">3D Network Graph</h3>
-              </div>
-              <p className="text-gray-300 mb-4">
-                Explore 100+ dApps in an interactive 3D space. Click nodes to see details, hover to view stats, and rotate to discover connections between protocols.
-              </p>
-              <div className="flex items-center gap-2 text-monad-purple font-semibold group-hover:gap-4 transition-all">
-                Explore Now
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-          </Link>
+      {/* dApp Detail Modal */}
+      <DAppDetailModal
+        dapp={selectedDApp}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
 
-          {/* Feature 2: Smart Recommendations */}
-          <Link href="/explorer" className="group">
-            <div className="glass p-8 rounded-2xl hover:border-monad-blue/50 border border-transparent transition-all duration-300 hover:scale-105 h-full cursor-pointer">
-              <div className="flex items-center gap-3 mb-4">
-                <Brain className="w-8 h-8 text-monad-blue" />
-                <h3 className="text-2xl font-bold text-white">Smart Suggestions</h3>
-              </div>
-              <p className="text-gray-300 mb-4">
-                Click any dApp to see intelligent recommendations of similar protocols. Discover related projects based on shared categories and use cases.
-              </p>
-              <div className="flex items-center gap-2 text-monad-blue font-semibold group-hover:gap-4 transition-all">
-                Try It Out
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-          </Link>
-
-          {/* Feature 3: Live Analytics */}
-          <Link href="/explorer" className="group">
-            <div className="glass p-8 rounded-2xl hover:border-monad-cyan/50 border border-transparent transition-all duration-300 hover:scale-105 h-full cursor-pointer">
-              <div className="flex items-center gap-3 mb-4">
-                <BarChart3 className="w-8 h-8 text-monad-cyan" />
-                <h3 className="text-2xl font-bold text-white">Live Analytics</h3>
-              </div>
-              <p className="text-gray-300 mb-4">
-                Real-time ecosystem stats showing total TVL, active users, 24h transactions, and trending categories. Watch the Monad ecosystem grow in real-time.
-              </p>
-              <div className="flex items-center gap-2 text-monad-cyan font-semibold group-hover:gap-4 transition-all">
-                View Stats
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-          </Link>
+      {/* Recommendation Panel - Only show in grid view on the side */}
+      {viewMode === "grid" && selectedDApp && (
+        <div className="fixed bottom-8 right-8 w-96 max-w-[calc(100vw-2rem)] max-h-96 overflow-y-auto z-40">
+          <RecommendationPanel
+            selectedDApp={selectedDApp}
+            relatedDApps={dappsData.filter(
+              (d) =>
+                d.id !== selectedDApp.id &&
+                d.categories.some((cat) => selectedDApp.categories.includes(cat))
+            )}
+          />
         </div>
-      </div>
+      )}
 
-      {/* How It Works */}
-      <div className="container mx-auto px-4 py-20">
-        <h2 className="text-4xl font-bold text-center mb-16 gradient-text">
-          How to Explore
-        </h2>
+      {/* Interactive Tour Guide */}
+      <TourGuide isFirstTime={true} />
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Step 1 */}
-          <div className="glass p-6 rounded-xl text-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-monad-purple to-monad-blue rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
-              1
-            </div>
-            <h4 className="text-lg font-semibold text-white mb-2">Connect Wallet</h4>
-            <p className="text-gray-400 text-sm">
-              Link your wallet to access personalized features and interact with dApps.
-            </p>
-          </div>
-
-          {/* Step 2 */}
-          <div className="glass p-6 rounded-xl text-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-monad-blue to-monad-cyan rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
-              2
-            </div>
-            <h4 className="text-lg font-semibold text-white mb-2">Rotate & Zoom</h4>
-            <p className="text-gray-400 text-sm">
-              Use your mouse to rotate the 3D network. Scroll to zoom in/out and explore.
-            </p>
-          </div>
-
-          {/* Step 3 */}
-          <div className="glass p-6 rounded-xl text-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-monad-cyan to-monad-purple rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
-              3
-            </div>
-            <h4 className="text-lg font-semibold text-white mb-2">Hover & Learn</h4>
-            <p className="text-gray-400 text-sm">
-              Hover over nodes to see dApp names, categories, and TVL instantly.
-            </p>
-          </div>
-
-          {/* Step 4 */}
-          <div className="glass p-6 rounded-xl text-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-monad-purple to-monad-blue rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
-              4
-            </div>
-            <h4 className="text-lg font-semibold text-white mb-2">Discover More</h4>
-            <p className="text-gray-400 text-sm">
-              Click dApps to see full details, related projects, and external links.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="container mx-auto px-4 py-20">
-        <div className="glass p-16 rounded-2xl border border-monad-purple/20 text-center">
-          <Sparkles className="w-16 h-16 text-monad-purple mx-auto mb-6" />
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Ready to Explore Monad?
-          </h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Dive into the 3D ecosystem visualization and discover 100+ projects building on Monad testnet.
-          </p>
-          <Link
-            href="/explorer"
-            className="inline-block px-10 py-4 bg-gradient-to-r from-monad-purple to-monad-blue rounded-lg font-semibold text-white hover:scale-105 transition-transform"
-          >
-            Launch Explorer
-          </Link>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="border-t border-white/10 py-8 mt-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h4 className="text-white font-semibold mb-3">MonadFlow</h4>
-              <p className="text-gray-400 text-sm">
-                3D ecosystem explorer for Monad blockchain testnet.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">Links</h4>
-              <ul className="text-gray-400 text-sm space-y-1">
-                <li><a href="https://monad.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Monad</a></li>
-                <li><a href="https://github.com/deseti/MonadFlow" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
-                <li><a href="https://testnet.monvision.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Explorer</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">Mission 9</h4>
-              <p className="text-gray-400 text-sm">
-                Squad Up Challenge • Open Source • MIT License
-              </p>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-8 text-center text-gray-400 text-sm">
-            <p>Built with Next.js, React Three Fiber & TailwindCSS</p>
-            <p className="mt-2">© 2025 MonadFlow. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      {/* AI Chatbot Assistant */}
+      <AIChatbot />
     </main>
+  );
+}
+
+function DAppCard({ dapp, onClick }: { dapp: DApp; onClick: (dapp: DApp) => void }) {
+  return (
+    <button
+      onClick={() => onClick(dapp)}
+      className="glass rounded-xl p-4 sm:p-6 hover:scale-105 transition-all duration-200 group text-left w-full"
+    >
+      <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+        <img
+          src={dapp.logo}
+          alt={dapp.name}
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex-shrink-0"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/placeholder.png";
+          }}
+        />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base sm:text-lg font-semibold text-white group-hover:text-monad-purple transition-colors truncate">
+            {dapp.name}
+          </h3>
+          <div className="flex flex-wrap gap-1 sm:gap-2 mt-1">
+            {dapp.categories.slice(0, 2).map((cat) => (
+              <span
+                key={cat}
+                className="text-xs px-2 py-1 bg-white/5 rounded text-gray-400"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <p className="text-xs sm:text-sm text-gray-400 line-clamp-3 mb-3 sm:mb-4">
+        {dapp.description}
+      </p>
+
+      <div className="flex items-center gap-2 text-xs flex-wrap">
+        {dapp.isLive && (
+          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded">
+            Live
+          </span>
+        )}
+        {dapp.onlyOnMonad && (
+          <span className="px-2 py-1 bg-monad-purple/20 text-monad-purple rounded">
+            Monad Only
+          </span>
+        )}
+      </div>
+    </button>
   );
 }
