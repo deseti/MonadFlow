@@ -6,19 +6,19 @@ import { Providers } from "@/components/providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MonadFlow - Discover dApps on Monad",
-  description: "A 3D interactive discovery layer and AI-powered recommendation engine for Monad mainnet. Explore the ecosystem in an immersive way.",
-  keywords: ["Monad", "dApps", "DeFi", "Web3", "Blockchain", "Discovery", "3D", "AI"],
+  title: "MonadFlow - 3D Monad Ecosystem Explorer",
+  description: "Immersive 3D visualization of the Monad ecosystem. Explore 100+ dApps, AI-powered recommendations, and real-time analytics. Experience the future of blockchain discovery.",
+  keywords: ["Monad", "dApps", "DeFi", "Web3", "Blockchain", "Discovery", "3D", "AI", "Network Visualization", "Interactive"],
   authors: [{ name: "MonadFlow Team" }],
   openGraph: {
-    title: "MonadFlow - Discover dApps on Monad",
-    description: "Explore Monad's ecosystem in 3D. AI-powered recommendations for discovering the best dApps.",
+    title: "MonadFlow - 3D Monad Ecosystem Explorer",
+    description: "Experience the Monad ecosystem like never before. Interactive 3D network visualization with 100+ dApps, AI recommendations, and real-time stats.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "MonadFlow - Discover dApps on Monad",
-    description: "Explore Monad's ecosystem in 3D. AI-powered recommendations.",
+    title: "MonadFlow - 3D Monad Ecosystem Explorer",
+    description: "Immersive 3D visualization of Monad's ecosystem. Explore 100+ dApps in stunning interactive 3D.",
   },
 };
 

@@ -16,17 +16,21 @@
 
 ## 🎯 Overview
 
-MonadFlow is an immersive 3D discovery platform and AI-powered recommendation engine built for the Monad mainnet ecosystem. Explore 200+ dApps through an interactive network graph, get personalized recommendations, and gamify your journey through the Monad ecosystem.
+MonadFlow is an immersive **3D-first discovery platform** and AI-powered recommendation engine built for the Monad mainnet ecosystem. The landing page features a stunning interactive 3D network visualization where you can explore 100+ dApps in real-time. Experience the magic of Web3 discovery like never before!
 
 **Built for:** Mission 9: Squad Up Challenge
 
+**🌟 What makes us unique:** The 3D visualization is now the landing page - no intermediate steps, just immediate immersive exploration!
+
 ## ✨ Features
 
-### 🎨 3D Network Visualization
+### 🎨 3D Network Visualization (Landing Page!)
+- **Instant immersive experience** - 3D view loads immediately on homepage
 - Interactive node-based interface powered by Three.js
 - Visual representation of dApp relationships and composability
 - Smooth animations and transitions
 - Real-time data integration
+- **The magic that makes MonadFlow unique!**
 
 ### 🤖 AI Chatbot Assistant
 - Powered by Google Gemini API
