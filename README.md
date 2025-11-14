@@ -16,7 +16,7 @@
 
 ## 🎯 Overview
 
-MonadFlow is an immersive **3D-first discovery platform** and AI-powered recommendation engine built for the Monad mainnet ecosystem. The landing page features a stunning interactive 3D network visualization where you can explore 100+ dApps in real-time. Experience the magic of Web3 discovery like never before!
+MonadFlow is an immersive **3D-first discovery platform** and AI-powered recommendation engine built for the Monad mainnet ecosystem. The landing page features a stunning interactive 3D network visualization where you can explore **300+ dApps** in real-time. Experience the magic of Web3 discovery like never before!
 
 **Built for:** Mission 9: Squad Up Challenge
 
@@ -32,19 +32,19 @@ MonadFlow is an immersive **3D-first discovery platform** and AI-powered recomme
 - Real-time data integration
 - **The magic that makes MonadFlow unique!**
 
-### 🤖 AI Chatbot Assistant
-- Powered by Google Gemini API
+### 🤖 AI Chatbot Assistant (NadAI)
+- Powered by OpenAI GPT-3.5-turbo
 - Context-aware responses about Monad ecosystem
 - Real-time help and guidance
-- Supports English and Indonesian
-- Floating chat interface
+- Professional English assistance
+- Full-screen mobile chat interface
 
 ### 🔍 Advanced Discovery
 - **Infinite Scroll**: Seamlessly load dApps as you explore
 - Filter by 15+ categories (DeFi, Gaming, NFT, AI, etc.)
 - Smart search functionality
 - Grid and 3D view modes
-- 100+ dApps from official Monad ecosystem
+- **300+ dApps** from official Monad ecosystem (Updated Nov 14, 2025)
 
 ### 🎮 Interactive Features
 - Tour guide for first-time users
@@ -188,6 +188,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 - [Monad](https://www.monad.xyz/) - For the incredible ecosystem
 - [Mission 9 Challenge](https://tally.so/r/31qYe4) - For the opportunity
+- [Monad Ecosystem Data](https://github.com/portdeveloper/monad-ecosystem) - For the comprehensive project list
 - All the amazing Monad dApp builders
 
 ## 🔗 Links
@@ -198,10 +199,11 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 ## 📊 Stats
 
-- 🎨 100+ dApps indexed (from official Monad ecosystem)
+- 🎨 **300+ dApps** indexed (from official Monad ecosystem - Updated Nov 14, 2025)
 - 🏷️ 15+ categories
 - 🔴 Live testnet data
 - 🎮 Interactive 3D exploration
+- 🤖 AI-powered assistant (NadAI)
 - 🤖 AI-powered chatbot assistant
 - ♾️ Infinite scroll for seamless discovery
 
